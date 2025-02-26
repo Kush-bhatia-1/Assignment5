@@ -1,0 +1,143 @@
+---
+title: "World Development Indicators Analysis"
+author: "Kush Bhatia"
+format: 
+  revealjs:
+    theme: night 
+    slide-number: true
+    transition: fade  
+    progress: true
+    width: 1600 
+    height: 900   
+execute:
+  echo: false
+---
+
+## 📌 Introduction  
+- Overview of the **World Development Indicators** dataset  
+- Key indicators analyzed:  
+  - 📈 **GDP per capita**  
+  - 🌍 **Life Expectancy**  
+  - 📉 **Unemployment Rate**  
+- **Purpose:** Understand economic and social trends  
+
+---
+
+## 📊 GDP per Capita & Life Expectancy  
+
+- 💰 Higher **GDP per capita** leads to longer **life expectancy**  
+- 🌍 Countries with **very low GDP** struggle with healthcare and living conditions  
+
+```{python}
+#| fig-width: 12
+#| fig-height: 4
+#| out-width: "90%"
+#| out-height: "auto"
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load dataset
+df = pd.read_csv("/Users/kushbhatia/Desktop/Senior/QTM350/wdi.csv")
+
+# Scatter plot
+plt.figure(figsize=(10, 6))
+sns.scatterplot(x=df['gdp_per_capita'], y=df['life_expectancy'], alpha=0.7, color="blue")
+
+plt.xlabel("GDP per Capita (USD)", fontsize=14)
+plt.ylabel("Life Expectancy (Years)", fontsize=14)
+plt.title("Relationship Between GDP per Capita and Life Expectancy", fontsize=16)
+
+plt.xscale("log")
+plt.grid(True, which="both", linestyle="--", linewidth=0.5)
+plt.tight_layout()
+
+plt.show()
+
+```
+
+---
+
+## 🌍 Life Expectancy  
+
+- Represents the **average lifespan** in a country  
+- Higher **GDP per capita** tends to increase **life expectancy**  
+
+```{python}
+#| label: tbl-key-stats
+#| tbl-cap: "Summary Statistics for GDP per Capita, Life Expectancy, and Unemployment Rate"
+#| out-width: "100%"
+#| out-height: "auto"
+#| fig-align: "center"
+
+import pandas as pd
+
+# Construct a table highlighting key statistics
+key_stats = df[['gdp_per_capita', 'life_expectancy', 'unemployment_rate']].describe().loc[
+    ['mean', 'min', 'max', 'std']
+]
+
+# Format the table for better readability
+key_stats = key_stats.rename(index={'mean': 'Mean', 'min': 'Minimum', 'max': 'Maximum', 'std': 'Standard Deviation'})
+
+# Display table using Quarto-friendly formatting
+import tabulate  # Ensures the table is properly formatted
+from IPython.display import display, Markdown
+
+display(Markdown(key_stats.to_markdown()))
+
+```
+
+---
+
+## Unemployment Rate by GDP Category
+
+- Economic conditions affect employment opportunities.
+- Low GDP countries tend to have **higher unemployment rates**.
+
+```{python}
+#| fig-width: 12
+#| fig-height: 4
+#| out-width: "90%"
+#| out-height: "auto"
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load dataset
+df = pd.read_csv("/Users/kushbhatia/Desktop/Senior/QTM350/wdi.csv")
+
+# Create GDP category bins
+df['gdp_category'] = pd.qcut(df['gdp_per_capita'], q=4, labels=["Low", "Lower-Mid", "Upper-Mid", "High"])
+
+# Calculate average unemployment rate by GDP category
+avg_unemployment = df.groupby('gdp_category')['unemployment_rate'].mean()
+
+# Increase figure size
+plt.figure(figsize=(10, 6))  # Adjust width and height
+
+# Bar chart
+sns.barplot(x=avg_unemployment.index, y=avg_unemployment.values, palette="Blues")
+
+# Improve readability
+plt.xlabel("GDP Category", fontsize=14)
+plt.ylabel("Average Unemployment Rate (%)", fontsize=14)
+plt.title("Unemployment Rate by GDP Category", fontsize=16)
+
+# Adjust layout to prevent cropping
+plt.tight_layout()
+
+plt.show()
+
+```
+
+
+---
+
+## Conclusion  
+- Economic factors influence life expectancy and employment  
+- Higher GDP per capita = Better living conditions & longer life expectancy  
+- Future research: Investigate additional social indicators  
+
